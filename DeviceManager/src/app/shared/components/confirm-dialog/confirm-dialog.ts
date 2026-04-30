@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, input, output } from '@angular/core';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-confirm-dialog',
-  imports: [CommonModule],
+  imports: [CommonModule, MatIcon],
   templateUrl: './confirm-dialog.html',
   styleUrl: './confirm-dialog.scss',
 })

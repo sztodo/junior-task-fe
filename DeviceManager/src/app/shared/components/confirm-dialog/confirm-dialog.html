@@ -1,7 +1,7 @@
 @if (visible()) {
   <div class="overlay" (click)="onCancel()">
     <div class="dialog" (click)="$event.stopPropagation()">
-      <div class="dialog__icon">🗑️</div>
+      <div class="dialog__icon"><mat-icon>delete</mat-icon></div>
       <h3 class="dialog__title">{{ title() }}</h3>
       <p class="dialog__message">{{ message() }}</p>
       <div class="dialog__actions">

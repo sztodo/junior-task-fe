@@ -1,0 +1,144 @@
+<div class="form-page">
+  <div class="form-page__header">
+    <button class="btn btn--ghost" (click)="goBack()"><mat-icon>arrow_back</mat-icon> Back</button>
+    <div>
+      <h1 class="form-page__title">{{ isEdit() ? 'Edit Device' : 'New Device' }}</h1>
+      <p class="form-page__subtitle">
+        {{
+          isEdit()
+            ? 'Update the device details below.'
+            : 'Fill in the details to register a new device.'
+        }}
+      </p>
+    </div>
+  </div>
+
+  <form class="device-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-section">
+      <h2 class="form-section__title">Identity</h2>
+      <div class="form-grid">
+        <div class="form-field">
+          <label class="form-label">Name *</label>
+          <input class="form-input" formControlName="name" placeholder="e.g. iPhone 15 Pro" />
+          @if (isInvalid('name')) {
+            <span class="form-error">{{ getError('name') }}</span>
+          }
+        </div>
+        <div class="form-field">
+          <label class="form-label">Manufacturer *</label>
+          <input class="form-input" formControlName="manufacturer" placeholder="e.g. Apple" />
+          @if (isInvalid('manufacturer')) {
+            <span class="form-error">{{ getError('manufacturer') }}</span>
+          }
+        </div>
+        <div class="form-field">
+          <label class="form-label">Type *</label>
+          <select class="form-select" formControlName="type">
+            <option [ngValue]="null" disabled>Select type...</option>
+            <-- add emojis, icons do not work here -->
+            <option [ngValue]="DeviceType.Phone">📱 Phone</option>
+            <option [ngValue]="DeviceType.Tablet">🖥️ Tablet</option>
+          </select>
+          @if (isInvalid('type')) {
+            <span class="form-error">Please select a device type.</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2 class="form-section__title">Software</h2>
+      <div class="form-grid">
+        <div class="form-field">
+          <label class="form-label">Operating System *</label>
+          <input
+            class="form-input"
+            formControlName="operatingSystem"
+            placeholder="e.g. iOS, Android"
+          />
+          @if (isInvalid('operatingSystem')) {
+            <span class="form-error">{{ getError('operatingSystem') }}</span>
+          }
+        </div>
+        <div class="form-field">
+          <label class="form-label">OS Version *</label>
+          <input class="form-input" formControlName="osVersion" placeholder="e.g. 17.2" />
+          @if (isInvalid('osVersion')) {
+            <span class="form-error">{{ getError('osVersion') }}</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2 class="form-section__title">Hardware</h2>
+      <div class="form-grid">
+        <div class="form-field">
+          <label class="form-label">Processor *</label>
+          <input class="form-input" formControlName="processor" placeholder="e.g. Apple A17 Pro" />
+          @if (isInvalid('processor')) {
+            <span class="form-error">{{ getError('processor') }}</span>
+          }
+        </div>
+        <div class="form-field">
+          <label class="form-label">RAM (GB) *</label>
+          <input
+            class="form-input"
+            type="number"
+            formControlName="ramAmount"
+            placeholder="e.g. 8"
+            min="1"
+          />
+          @if (isInvalid('ramAmount')) {
+            <span class="form-error">{{ getError('ramAmount') }}</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2 class="form-section__title">Details</h2>
+      <div class="form-grid">
+        <div class="form-field">
+          <label class="form-label">Assign to User</label>
+          <select class="form-select" formControlName="assignedUserId">
+            <option [ngValue]="null">Unassigned</option>
+            @for (user of userService.users(); track user.id) {
+              <option [ngValue]="user.id">{{ user.name }} — {{ user.role }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field form-field--wide">
+          <label class="form-label">Description</label>
+          <textarea
+            class="form-input form-textarea"
+            formControlName="description"
+            placeholder="Optional notes about this device..."
+            rows="3"
+          >
+          </textarea>
+        </div>
+      </div>
+    </div>
+
+    @if (duplicateWarning()) {
+      <div class="form-warning">
+        ⚠ A device named "{{ form.get('name')?.value }}" already exists.
+      </div>
+    }
+
+    <div class="form-actions">
+      <button type="button" class="btn btn--ghost" (click)="goBack()">Cancel</button>
+      <button
+        type="submit"
+        class="btn btn--primary"
+        [disabled]="form.invalid || deviceService.loading() || duplicateWarning()"
+      >
+        @if (deviceService.loading()) {
+          <span class="btn-spinner"></span>
+        }
+        {{ isEdit() ? 'Save Changes' : 'Create Device' }}
+      </button>
+    </div>
+  </form>
+</div>

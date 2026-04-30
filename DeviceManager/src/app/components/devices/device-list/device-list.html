@@ -19,7 +19,7 @@
         class="search-box__input"
         type="text"
         placeholder="Search devices..."
-        [(ngModel)]="searchTerm"
+        [ngModel]="searchTerm()"
       />
     </div>
     <div class="filter-chips">
@@ -74,7 +74,7 @@
         <div class="device-card" (click)="router.navigate(['/devices', device.id])">
           <div class="device-card__header">
             <span class="device-card__type-badge">
-              @if (device.typeLabel === 'Phone') {
+              @if (device.typeLabel === DeviceType.Phone) {
                 <mat-icon>smartphone</mat-icon>
               } @else {
                 <mat-icon>tablet</mat-icon>

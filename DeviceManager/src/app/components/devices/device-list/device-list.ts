@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Device as DeviceService } from '../../../shared/services/device';
 import { Toaster } from '../../../core/services/toaster';
-import { Device, DeviceType } from '../../../shared/models/device.model';
+import { Device, DeviceType, DeviceTypeLabel } from '../../../shared/models/device.model';
 import { FormsModule } from '@angular/forms';
 import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -22,15 +22,15 @@ export class DeviceList implements OnInit {
   protected readonly showDeleteDialog = signal(false);
   protected readonly deviceToDelete = signal<Device | null>(null);
 
-  protected readonly DeviceType = DeviceType;
+  protected readonly DeviceType = DeviceTypeLabel;
 
   // search bar logic
-  protected searchTerm = '';
+  protected searchTerm = signal('');
   protected readonly activeFilter = signal<'all' | 'phone' | 'tablet' | 'unassigned'>('all');
 
   protected readonly filteredDevices = computed(() => {
     let list = this.deviceService.devices();
-    const term = this.searchTerm.toLowerCase();
+    const term = this.searchTerm().toLowerCase();
     const filter = this.activeFilter();
 
     if (term) {
@@ -43,9 +43,8 @@ export class DeviceList implements OnInit {
       );
     }
 
-    if (filter === 'phone') list = list.filter((d) => d.typeLabel === DeviceType.Phone.toString());
-    if (filter === 'tablet')
-      list = list.filter((d) => d.typeLabel === DeviceType.Tablet.toString());
+    if (filter === 'phone') list = list.filter((d) => d.typeLabel === DeviceTypeLabel.Phone);
+    if (filter === 'tablet') list = list.filter((d) => d.typeLabel === DeviceTypeLabel.Tablet);
     if (filter === 'unassigned') list = list.filter((d) => !d.assignedUserId);
 
     return list;

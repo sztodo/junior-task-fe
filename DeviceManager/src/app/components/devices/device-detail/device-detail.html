@@ -1,0 +1,134 @@
+@if (deviceService.loading()) {
+  <div class="loading">
+    <div class="spinner"></div>
+    Loading...
+  </div>
+} @else if (deviceService.selectedDevice(); as device) {
+  <div class="detail-page">
+    <div class="detail-page__bar">
+      <button class="btn btn--ghost" (click)="router.navigate(['/devices'])">
+        <mat-icon>arrow_back</mat-icon> Back
+      </button>
+      <div class="detail-page__bar-actions">
+        <button
+          class="btn btn--secondary"
+          (click)="router.navigate(['/devices', device.id, 'edit'])"
+        >
+          <mat-icon>edit</mat-icon> Edit
+        </button>
+        <button class="btn btn--danger" (click)="showDeleteDialog.set(true)">
+          <mat-icon>delete</mat-icon> Delete
+        </button>
+      </div>
+    </div>
+
+    <div class="detail-hero">
+      <div class="detail-hero__icon">
+        @if (device.typeLabel === DeviceTypeLabel.Phone) {
+          <mat-icon>smartphone</mat-icon>
+        } @else {
+          <mat-icon>tablet</mat-icon>
+        }
+      </div>
+      <div>
+        <div class="detail-hero__badge">{{ device.typeLabel }}</div>
+        <h1 class="detail-hero__name">{{ device.name }}</h1>
+        <p class="detail-hero__manufacturer">by {{ device.manufacturer }}</p>
+      </div>
+    </div>
+
+    <div class="detail-grid">
+      <div class="card">
+        <h2 class="card__title">Specifications</h2>
+        <div class="spec-list">
+          <div class="spec-row">
+            <span class="spec-row__label">Operating System</span>
+            <span class="spec-row__value">{{ device.operatingSystem }}</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-row__label">OS Version</span>
+            <span class="spec-row__value">{{ device.osVersion }}</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-row__label">Processor</span>
+            <span class="spec-row__value">{{ device.processor }}</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-row__label">RAM</span>
+            <span class="spec-row__value">{{ device.ramAmount }} GB</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card__title">Assignment</h2>
+        @if (device.assignedUserName) {
+          <div class="assignee-detail">
+            <div class="assignee-detail__avatar">{{ device.assignedUserName[0] }}</div>
+            <div>
+              <p class="assignee-detail__name">{{ device.assignedUserName }}</p>
+              <p class="assignee-detail__label">Current user</p>
+            </div>
+          </div>
+          <button
+            class="btn btn--ghost btn--sm"
+            style="margin-top: 1rem"
+            (click)="unassign(device.id)"
+          >
+            Unassign device
+          </button>
+        } @else {
+          <div class="available-state">
+            <span class="badge badge--available">Available</span>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin: 0.5rem 0 1rem">
+              This device is not assigned to anyone.
+            </p>
+            <select class="select" [(ngModel)]="selectedUserId">
+              <option [ngValue]="null">Select a user...</option>
+              @for (user of userService.users(); track user.id) {
+                <option [ngValue]="user.id">{{ user.name }} — {{ user.role }}</option>
+              }
+            </select>
+            <button
+              class="btn btn--primary btn--sm"
+              style="margin-top: 0.75rem"
+              [disabled]="!selectedUserId"
+              (click)="assign(device.id)"
+            >
+              Assign
+            </button>
+          </div>
+        }
+      </div>
+
+      @if (device.description) {
+        <div class="card card--wide">
+          <h2 class="card__title">Description</h2>
+          <p class="description">{{ device.description }}</p>
+        </div>
+      }
+
+      <div class="card">
+        <h2 class="card__title">Meta</h2>
+        <div class="spec-list">
+          <div class="spec-row">
+            <span class="spec-row__label">Created</span>
+            <span class="spec-row__value">{{ device.createdAt | date: 'mediumDate' }}</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-row__label">Last Updated</span>
+            <span class="spec-row__value">{{ device.updatedAt | date: 'mediumDate' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<app-confirm-dialog
+  [visible]="showDeleteDialog()"
+  [title]="'Delete ' + (deviceService.selectedDevice()?.name ?? '')"
+  message="This device will be permanently removed from the system."
+  (confirmed)="onDeleteConfirmed()"
+  (cancelled)="showDeleteDialog.set(false)"
+/>
