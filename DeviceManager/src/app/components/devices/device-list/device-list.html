@@ -1,0 +1,133 @@
+<div class="page">
+  <div class="page__header">
+    <div>
+      <h1 class="page__title">Devices</h1>
+      <p class="page__subtitle">
+        {{ deviceService.totalDevices() }} total · {{ deviceService.assignedDevices().length }} in
+        use · {{ deviceService.unassignedDevices().length }} available
+      </p>
+    </div>
+    <button class="btn btn--primary" (click)="router.navigate(['/devices/new'])">
+      <mat-icon>add</mat-icon>Add Device
+    </button>
+  </div>
+
+  <div class="filters">
+    <div class="search-box">
+      <span class="search-box__icon"><mat-icon>search</mat-icon></span>
+      <input
+        class="search-box__input"
+        type="text"
+        placeholder="Search devices..."
+        [(ngModel)]="searchTerm"
+      />
+    </div>
+    <div class="filter-chips">
+      <button
+        class="chip"
+        [class.chip--active]="activeFilter() === 'all'"
+        (click)="activeFilter.set('all')"
+      >
+        All
+      </button>
+      <button
+        class="chip"
+        [class.chip--active]="activeFilter() === 'phone'"
+        (click)="activeFilter.set('phone')"
+      >
+        <mat-icon>smartphone</mat-icon> Phones
+      </button>
+      <button
+        class="chip"
+        [class.chip--active]="activeFilter() === 'tablet'"
+        (click)="activeFilter.set('tablet')"
+      >
+        <mat-icon>tablet</mat-icon> Tablets
+      </button>
+      <button
+        class="chip"
+        [class.chip--active]="activeFilter() === 'unassigned'"
+        (click)="activeFilter.set('unassigned')"
+      >
+        Available
+      </button>
+    </div>
+  </div>
+
+  @if (deviceService.loading()) {
+    <div class="loading">
+      <div class="spinner"></div>
+      <span>Loading devices...</span>
+    </div>
+  } @else if (filteredDevices().length === 0) {
+    <div class="empty">
+      <div class="empty__icon"><mat-icon>inbox</mat-icon></div>
+      <h3 class="empty__title">No devices found</h3>
+      <p class="empty__text">Try adjusting your search or filters.</p>
+      <button class="btn btn--primary" (click)="router.navigate(['/devices/new'])">
+        Add your first device
+      </button>
+    </div>
+  } @else {
+    <div class="device-grid">
+      @for (device of filteredDevices(); track device.id) {
+        <div class="device-card" (click)="router.navigate(['/devices', device.id])">
+          <div class="device-card__header">
+            <span class="device-card__type-badge">
+              @if (device.typeLabel === 'Phone') {
+                <mat-icon>smartphone</mat-icon>
+              } @else {
+                <mat-icon>tablet</mat-icon>
+              }
+              {{ device.typeLabel }}
+            </span>
+            <div class="device-card__actions" (click)="$event.stopPropagation()">
+              <button
+                class="icon-btn icon-btn--edit"
+                title="Edit"
+                (click)="router.navigate(['/devices', device.id, 'edit'])"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button
+                class="icon-btn icon-btn--delete"
+                title="Delete"
+                (click)="confirmDelete(device)"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <div class="device-card__body">
+            <h3 class="device-card__name">{{ device.name }}</h3>
+            <p class="device-card__manufacturer">{{ device.manufacturer }}</p>
+
+            <div class="device-card__specs">
+              <span class="spec">{{ device.operatingSystem }} {{ device.osVersion }}</span>
+              <span class="spec">{{ device.ramAmount }} GB RAM</span>
+            </div>
+          </div>
+
+          <div class="device-card__footer">
+            @if (device.assignedUserName) {
+              <div class="assignee">
+                <div class="assignee__avatar">{{ device.assignedUserName[0] }}</div>
+                <span class="assignee__name">{{ device.assignedUserName }}</span>
+              </div>
+            } @else {
+              <span class="badge badge--available">Available</span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+<app-confirm-dialog
+  [visible]="showDeleteDialog()"
+  [title]="'Delete ' + (deviceToDelete()?.name ?? '')"
+  message="This device will be permanently removed from the system."
+  (confirmed)="onDeleteConfirmed()"
+  (cancelled)="showDeleteDialog.set(false)"
+/>

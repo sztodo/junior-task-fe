@@ -1,0 +1,13 @@
+@if (visible()) {
+  <div class="overlay" (click)="onCancel()">
+    <div class="dialog" (click)="$event.stopPropagation()">
+      <div class="dialog__icon">🗑️</div>
+      <h3 class="dialog__title">{{ title() }}</h3>
+      <p class="dialog__message">{{ message() }}</p>
+      <div class="dialog__actions">
+        <button class="btn btn--ghost" (click)="onCancel()">Cancel</button>
+        <button class="btn btn--danger" (click)="onConfirm()">Delete</button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,34 @@
+<div class="shell">
+  <aside class="sidebar">
+    <div class="sidebar__brand">
+      <div class="sidebar__logo"><mat-icon>electric_bolt</mat-icon></div>
+      <div>
+        <span class="sidebar__brand-name">DevTrack</span>
+        <span class="sidebar__brand-sub">Device Management</span>
+      </div>
+    </div>
+
+    <nav class="sidebar__nav">
+      <span class="sidebar__nav-label">Menu</span>
+      <a
+        class="sidebar__link"
+        routerLink="/devices"
+        routerLinkActive="sidebar__link--active"
+        [routerLinkActiveOptions]="{ exact: false }"
+      >
+        <span class="sidebar__link-icon"><mat-icon>perm_device_info</mat-icon></span>
+        <span>Devices</span>
+      </a>
+    </nav>
+
+    <div class="sidebar__footer">
+      <div class="sidebar__version">v1.0.0 · Phase 2</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <router-outlet />
+  </main>
+</div>
+
+<app-toast />

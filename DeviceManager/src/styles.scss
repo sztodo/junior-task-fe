@@ -1,0 +1,254 @@
+@use '@angular/material' as mat;
+
+html {
+    height: 100%;
+    @include mat.theme((color: (primary: mat.$magenta-palette,
+                tertiary: mat.$violet-palette,
+            ),
+            typography: Roboto,
+            density: 0,
+        ));
+}
+
+body {
+    // Default the application to a light color theme. This can be changed to
+    // `dark` to enable the dark color theme, or to `light dark` to defer to the
+    // user's system settings.
+    color-scheme: light;
+
+    // Set a default background, font and text colors for the application using
+    // Angular Material's system-level CSS variables. Learn more about these
+    // variables at https://material.angular.dev/guide/system-variables
+    background-color: var(--mat-sys-surface);
+    color: var(--mat-sys-on-surface);
+    font: var(--mat-sys-body-medium);
+
+    // Reset the user agent margin.
+    margin: 0;
+    height: 100%;
+}
+
+:root {
+    --bg: #0d0f14;
+    --surface: #13161d;
+    --surface-hover: #1a1e28;
+    --border: #1f2433;
+    --border-hover: #2a3045;
+
+    --light-bg: #6c8fff;
+
+    --accent: #6c8fff;
+    --accent-hover: #8aabff;
+    --accent-glow: rgba(108, 143, 255, 0.12);
+
+    --text-primary: #eef0f6;
+    --text-secondary: #7a839a;
+    --text-tertiary: #4a5268;
+
+    --danger: #ef4444;
+    --danger-glow: rgba(239, 68, 68, 0.12);
+    --success: #10b981;
+    --warning: #f59e0b;
+    --font-body: 'DM Sans', system-ui, sans-serif;
+    --font-mono: 'DM Mono', 'Fira Code', monospace;
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.4);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(108, 143, 255, 0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(108, 143, 255, 0.015) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+app-root {
+    position: relative;
+    z-index: 1;
+}
+
+a {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--accent-hover);
+}
+
+input,
+select,
+textarea,
+button {
+    font-family: inherit;
+    font-size: inherit;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-hover);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-tertiary);
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition:
+        background 0.18s,
+        color 0.18s,
+        border-color 0.18s,
+        box-shadow 0.18s,
+        transform 0.15s;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.btn:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+.btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.btn--primary {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+    box-shadow: 0 4px 16px var(--accent-glow);
+}
+
+.btn--primary:hover:not(:disabled) {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    box-shadow: 0 6px 24px rgba(108, 143, 255, 0.3);
+}
+
+.btn--secondary {
+    background: var(--surface);
+    color: var(--text-primary);
+    border-color: var(--border-hover);
+}
+
+.btn--secondary:hover:not(:disabled) {
+    background: var(--surface-hover);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.btn--ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border-color: transparent;
+}
+
+.btn--ghost:hover:not(:disabled) {
+    background: var(--border);
+    color: var(--text-primary);
+}
+
+.btn--danger {
+    background: var(--danger);
+    color: #fff;
+    border-color: var(--danger);
+}
+
+.btn--danger:hover:not(:disabled) {
+    background: #dc2626;
+    box-shadow: 0 4px 16px var(--danger-glow);
+}
+
+.btn--sm {
+    padding: 0.4rem 0.875rem;
+    font-size: 0.8rem;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+:root {
+    view-transition-name: none;
+}
+
+::view-transition-old(root) {
+    animation: 200ms ease-out both fade-out;
+}
+
+::view-transition-new(root) {
+    animation: 250ms ease-in both fade-in;
+}
+
+@keyframes fade-out {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
