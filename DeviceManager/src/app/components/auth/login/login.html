@@ -1,0 +1,69 @@
+<div class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-card__brand">
+      <div class="auth-card__logo"><mat-icon>electric_bolt</mat-icon></div>
+      <h1 class="auth-card__title">DevTrack</h1>
+      <p class="auth-card__subtitle">Sign in to your account</p>
+    </div>
+
+    <form class="auth-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-field">
+        <label class="form-label">Email</label>
+        <input
+          class="form-input"
+          type="email"
+          formControlName="email"
+          placeholder="you@company.com"
+          autocomplete="email"
+        />
+        @if (isInvalid('email')) {
+          <span class="form-error">Please enter a valid email address.</span>
+        }
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">Password</label>
+        <div class="input-wrap">
+          <input
+            class="form-input"
+            [type]="showPassword() ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="••••••••"
+            autocomplete="current-password"
+          />
+          <button
+            type="button"
+            class="input-wrap__toggle"
+            (click)="showPassword.set(!showPassword())"
+          >
+            @if (showPassword()) {
+              <mat-icon>visibility_off</mat-icon>
+            } @else {
+              <mat-icon>visibility</mat-icon>
+            }
+          </button>
+        </div>
+        @if (isInvalid('password')) {
+          <span class="form-error">Password is required.</span>
+        }
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn--primary btn--full"
+        [disabled]="form.invalid || loading()"
+      >
+        @if (loading()) {
+          <span class="btn-spinner"></span> Signing in...
+        } @else {
+          Sign In
+        }
+      </button>
+    </form>
+
+    <p class="auth-card__footer">
+      Don't have an account?
+      <a routerLink="/register">Create one</a>
+    </p>
+  </div>
+</div>

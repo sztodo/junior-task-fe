@@ -112,4 +112,22 @@ export class Device {
       (d) => d.name.toLowerCase() === name.toLowerCase() && d.id !== excludeId,
     );
   }
+
+  selfAssign(deviceId: number): Observable<DeviceModel> {
+    return this.http.post<DeviceModel>(`${this.baseUrl}/${deviceId}/self-assign`, {}).pipe(
+      tap((updated) => {
+        this._devices.update((list) => list.map((d) => (d.id === deviceId ? updated : d)));
+        this._selectedDevice.set(updated);
+      }),
+    );
+  }
+
+  selfUnassign(deviceId: number): Observable<DeviceModel> {
+    return this.http.delete<DeviceModel>(`${this.baseUrl}/${deviceId}/self-unassign`).pipe(
+      tap((updated) => {
+        this._devices.update((list) => list.map((d) => (d.id === deviceId ? updated : d)));
+        this._selectedDevice.set(updated);
+      }),
+    );
+  }
 }

@@ -1,34 +1,55 @@
-<div class="shell">
-  <aside class="sidebar">
-    <div class="sidebar__brand">
-      <div class="sidebar__logo"><mat-icon>electric_bolt</mat-icon></div>
-      <div>
-        <span class="sidebar__brand-name">DevTrack</span>
-        <span class="sidebar__brand-sub">Device Management</span>
+@if (authService.isAuthenticated()) {
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="sidebar__brand">
+        <div class="sidebar__logo"><mat-icon>electric_bolt</mat-icon></div>
+        <div>
+          <span class="sidebar__brand-name">DevTrack</span>
+          <span class="sidebar__brand-sub">Device Management</span>
+        </div>
       </div>
-    </div>
 
-    <nav class="sidebar__nav">
-      <span class="sidebar__nav-label">Menu</span>
-      <a
-        class="sidebar__link"
-        routerLink="/devices"
-        routerLinkActive="sidebar__link--active"
-        [routerLinkActiveOptions]="{ exact: false }"
-      >
-        <span class="sidebar__link-icon"><mat-icon>perm_device_info</mat-icon></span>
-        <span>Devices</span>
-      </a>
-    </nav>
+      <nav class="sidebar__nav">
+        <span class="sidebar__nav-label">Menu</span>
+        <a
+          class="sidebar__link"
+          routerLink="/devices"
+          routerLinkActive="sidebar__link--active"
+          [routerLinkActiveOptions]="{ exact: false }"
+        >
+          <span class="sidebar__link-icon"><mat-icon>perm_device_info</mat-icon></span>
+          <span>Devices</span>
+        </a>
+      </nav>
 
-    <div class="sidebar__footer">
-      <div class="sidebar__version">v1.0.0 · Phase 2</div>
-    </div>
-  </aside>
+      <div class="sidebar__user">
+        <div class="sidebar__user-info">
+          <div class="sidebar__user-avatar">
+            {{ authService.currentUser()?.email?.[0]?.toUpperCase() }}
+          </div>
+          <div class="sidebar__user-details">
+            <span class="sidebar__user-email">
+              {{ authService.currentUser()?.email }}
+            </span>
+            <span class="sidebar__user-role">
+              {{ authService.currentUser()?.role }}
+            </span>
+          </div>
+        </div>
+        <button class="sidebar__logout" (click)="authService.logout()" title="Sign out">
+          <mat-icon>logout</mat-icon>
+        </button>
+      </div>
+    </aside>
 
-  <main class="main">
-    <router-outlet />
-  </main>
-</div>
+    <main class="main">
+      <router-outlet />
+    </main>
+  </div>
+} @else {
+  <router-outlet />
+}
+
+<app-toast />
 
 <app-toast />

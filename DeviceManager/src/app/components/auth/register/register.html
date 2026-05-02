@@ -1,0 +1,138 @@
+<div class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-card__brand">
+      <div class="auth-card__logo"><mat-icon>electric_bolt</mat-icon></div>
+      <h1 class="auth-card__title">Create account</h1>
+      <p class="auth-card__subtitle">Join DevTrack to manage devices</p>
+    </div>
+
+    <form class="auth-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-section-label">Account</div>
+
+      <div class="form-field">
+        <label class="form-label">Email</label>
+        <input
+          class="form-input"
+          type="email"
+          formControlName="email"
+          placeholder="you@company.com"
+          autocomplete="email"
+        />
+        @if (isInvalid('email')) {
+          <span class="form-error">Please enter a valid email address.</span>
+        }
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">Password</label>
+        <div class="input-wrap">
+          <input
+            class="form-input"
+            [type]="showPassword() ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="At least 8 characters"
+            autocomplete="new-password"
+          />
+          <button
+            type="button"
+            class="input-wrap__toggle"
+            (click)="showPassword.set(!showPassword())"
+          >
+            @if (showPassword()) {
+              <mat-icon>visibility_off</mat-icon>
+            } @else {
+              <mat-icon>visibility</mat-icon>
+            }
+          </button>
+        </div>
+        @if (isInvalid('password')) {
+          <span class="form-error">Password must be at least 8 characters.</span>
+        }
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">Confirm Password</label>
+        <div class="input-wrap">
+          <input
+            class="form-input"
+            [type]="showPassword() ? 'text' : 'password'"
+            formControlName="confirmPassword"
+            placeholder="Repeat your password"
+            autocomplete="new-password"
+          />
+        </div>
+        @if (form.errors?.['passwordMismatch'] && form.get('confirmPassword')?.touched) {
+          <span class="form-error">Passwords do not match.</span>
+        }
+      </div>
+
+      @if (form.get('password')?.value; as pw) {
+        <div class="strength-bar">
+          <div
+            class="strength-bar__fill"
+            [class]="strengthClass(pw)"
+            [style.width]="strengthWidth(pw)"
+          ></div>
+          <span class="strength-bar__label">{{ strengthLabel(pw) }}</span>
+        </div>
+      }
+
+      <!-- Profile section -->
+      <div class="form-section-label" style="margin-top: 0.5rem">Profile</div>
+
+      <div class="form-field">
+        <label class="form-label">Full Name</label>
+        <input
+          class="form-input"
+          type="text"
+          formControlName="name"
+          placeholder="e.g. Alice Johnson"
+          autocomplete="name"
+        />
+        @if (isInvalid('name')) {
+          <span class="form-error">Full name is required.</span>
+        }
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">Job Role</label>
+        <input
+          class="form-input"
+          type="text"
+          formControlName="role"
+          placeholder="e.g. Software Engineer"
+        />
+        @if (isInvalid('role')) {
+          <span class="form-error">Job role is required.</span>
+        }
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">Location</label>
+        <input
+          class="form-input"
+          type="text"
+          formControlName="location"
+          placeholder="e.g. New York, USA"
+        />
+        @if (isInvalid('location')) {
+          <span class="form-error">Location is required.</span>
+        }
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn--primary btn--full"
+        [disabled]="form.invalid || loading()"
+      >
+        @if (loading()) {
+          <span class="btn-spinner"></span> Creating account...
+        } @else {
+          Create Account
+        }
+      </button>
+    </form>
+
+    <p class="auth-card__footer">Already have an account? <a routerLink="/login">Sign in</a></p>
+  </div>
+</div>

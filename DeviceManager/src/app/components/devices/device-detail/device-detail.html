@@ -10,15 +10,17 @@
         <mat-icon>arrow_back</mat-icon> Back
       </button>
       <div class="detail-page__bar-actions">
-        <button
-          class="btn btn--secondary"
-          (click)="router.navigate(['/devices', device.id, 'edit'])"
-        >
-          <mat-icon>edit</mat-icon> Edit
-        </button>
-        <button class="btn btn--danger" (click)="showDeleteDialog.set(true)">
-          <mat-icon>delete</mat-icon> Delete
-        </button>
+        @if (authService.isAdmin()) {
+          <button
+            class="btn btn--secondary"
+            (click)="router.navigate(['/devices', device.id, 'edit'])"
+          >
+            <mat-icon>edit</mat-icon> Edit
+          </button>
+          <button class="btn btn--danger" (click)="showDeleteDialog.set(true)">
+            <mat-icon>delete</mat-icon> Delete
+          </button>
+        }
       </div>
     </div>
 
@@ -62,42 +64,34 @@
 
       <div class="card">
         <h2 class="card__title">Assignment</h2>
+
         @if (device.assignedUserName) {
           <div class="assignee-detail">
             <div class="assignee-detail__avatar">{{ device.assignedUserName[0] }}</div>
             <div>
               <p class="assignee-detail__name">{{ device.assignedUserName }}</p>
-              <p class="assignee-detail__label">Current user</p>
             </div>
           </div>
-          <button
-            class="btn btn--ghost btn--sm"
-            style="margin-top: 1rem"
-            (click)="unassign(device.id)"
-          >
-            Unassign device
-          </button>
+
+          @if (isAssignedToMe(device.assignedUserId)) {
+            <div class="self-action">
+              <p class="self-action__hint">You are using this device.</p>
+              <button class="btn btn--secondary btn--sm" (click)="selfUnassign(device.id)">
+                <mat-icon>keyboard_return</mat-icon> Return device
+              </button>
+            </div>
+          }
         } @else {
-          <div class="available-state">
-            <span class="badge badge--available">Available</span>
-            <p style="color: var(--text-secondary); font-size: 0.85rem; margin: 0.5rem 0 1rem">
-              This device is not assigned to anyone.
-            </p>
-            <select class="select" [(ngModel)]="selectedUserId">
-              <option [ngValue]="null">Select a user...</option>
-              @for (user of userService.users(); track user.id) {
-                <option [ngValue]="user.id">{{ user.name }} — {{ user.role }}</option>
-              }
-            </select>
-            <button
-              class="btn btn--primary btn--sm"
-              style="margin-top: 0.75rem"
-              [disabled]="!selectedUserId"
-              (click)="assign(device.id)"
-            >
-              Assign
-            </button>
-          </div>
+          <span class="badge badge--available">Available</span>
+          <p class="available-text">This device is not assigned to anyone.</p>
+
+          <button
+            class="btn btn--primary btn--sm"
+            style="margin-top: 1rem"
+            (click)="selfAssign(device.id)"
+          >
+            <mat-icon>pan_tool</mat-icon> Take this device
+          </button>
         }
       </div>
 
@@ -128,7 +122,7 @@
 <app-confirm-dialog
   [visible]="showDeleteDialog()"
   [title]="'Delete ' + (deviceService.selectedDevice()?.name ?? '')"
-  message="This device will be permanently removed from the system."
+  messag="This device will be permanently removed from the system."
   (confirmed)="onDeleteConfirmed()"
   (cancelled)="showDeleteDialog.set(false)"
 />
