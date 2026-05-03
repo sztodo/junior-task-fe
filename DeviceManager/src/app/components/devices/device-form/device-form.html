@@ -13,6 +13,11 @@
     </div>
   </div>
 
+  @if (duplicateWarning()) {
+    <div class="form-warning">
+      <mat-icon>warning</mat-icon> A device named "{{ form.get('name')?.value }}" already exists.
+    </div>
+  }
   <form class="device-form" [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="form-section">
       <h2 class="form-section__title">Identity</h2>
@@ -108,24 +113,40 @@
             }
           </select>
         </div>
+        @if (canGenerateDescription()) {
+          <div class="form-field--wide">
+            <mat-icon
+              (click)="generateDescription()"
+              matTooltip="Generate ai description"
+              matTooltipPosition="above"
+            >
+              auto_awesome
+            </mat-icon>
+            @if (aiLoading()) {
+              <span class="ai-spinner"></span>
+              <span>Generating...</span>
+            }
+          </div>
+        }
         <div class="form-field form-field--wide">
           <label class="form-label">Description</label>
-          <textarea
-            class="form-input form-textarea"
-            formControlName="description"
-            placeholder="Optional notes about this device..."
-            rows="3"
-          >
-          </textarea>
+          <div class="textarea-wrap">
+            <textarea
+              class="form-input form-textarea"
+              formControlName="description"
+              placeholder="Optional notes about this device..."
+              rows="3"
+            >
+            </textarea>
+            @if (aiLoading()) {
+              <div class="textarea-overlay">
+                <div class="ai-pulse">✦ Gemini is thinking...</div>
+              </div>
+            }
+          </div>
         </div>
       </div>
     </div>
-
-    @if (duplicateWarning()) {
-      <div class="form-warning">
-        ⚠ A device named "{{ form.get('name')?.value }}" already exists.
-      </div>
-    }
 
     <div class="form-actions">
       <button type="button" class="btn btn--ghost" (click)="goBack()">Cancel</button>
@@ -133,6 +154,7 @@
         type="submit"
         class="btn btn--primary"
         [disabled]="form.invalid || deviceService.loading() || duplicateWarning()"
+        [matTooltip]="getTooltipText()"
       >
         @if (deviceService.loading()) {
           <span class="btn-spinner"></span>

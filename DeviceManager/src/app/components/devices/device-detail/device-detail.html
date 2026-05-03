@@ -73,10 +73,17 @@
             </div>
           </div>
 
-          @if (isAssignedToMe(device.assignedUserId)) {
+          @if (authService.isAdmin() || isAssignedToMe(device.assignedUserId)) {
             <div class="self-action">
-              <p class="self-action__hint">You are using this device.</p>
-              <button class="btn btn--secondary btn--sm" (click)="selfUnassign(device.id)">
+              @if (isAssignedToMe(device.assignedUserId)) {
+                <p class="self-action__hint">You are using this device.</p>
+              } @else {
+                <p class="self-action__hint">This device is being used.</p>
+              }
+              <button
+                class="btn btn--secondary btn--sm"
+                (click)="authService.isAdmin() ? unassign(device.id) : selfUnassign(device.id)"
+              >
                 <mat-icon>keyboard_return</mat-icon> Return device
               </button>
             </div>
@@ -101,7 +108,6 @@
           <p class="description">{{ device.description }}</p>
         </div>
       }
-
       <div class="card">
         <h2 class="card__title">Meta</h2>
         <div class="spec-list">

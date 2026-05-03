@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
-import { MatIcon } from '@angular/material/icon';
+import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DeviceTypeLabel } from '../../../shared/models/device.model';
 import { Device } from '../../../shared/services/device';
@@ -12,7 +12,7 @@ import { Auth } from '../../../shared/services/auth';
 
 @Component({
   selector: 'app-device-detail',
-  imports: [CommonModule, FormsModule, ConfirmDialog, MatIcon],
+  imports: [CommonModule, FormsModule, ConfirmDialog, MatIconModule],
   templateUrl: './device-detail.html',
   styleUrl: './device-detail.scss',
 })
@@ -58,6 +58,10 @@ export class DeviceDetail implements OnInit {
     this.deviceService.selfUnassign(deviceId).subscribe({
       next: () => this.toast.success('Device returned successfully.'),
     });
+  }
+
+  clickIcon() {
+    console.log('clicked');
   }
 
   onDeleteConfirmed(): void {

@@ -1,22 +1,25 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatIcon } from '@angular/material/icon';
+import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DeviceType, DeviceTypeLabel } from '../../../shared/models/device.model';
 import { Device } from '../../../shared/services/device';
 import { User } from '../../../shared/services/user';
 import { Toaster } from '../../../core/services/toaster';
+import { Ai } from '../../../shared/services/ai';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-device-form',
-  imports: [CommonModule, ReactiveFormsModule, MatIcon],
+  imports: [CommonModule, ReactiveFormsModule, MatIconModule, MatTooltipModule],
   templateUrl: './device-form.html',
   styleUrl: './device-form.scss',
 })
 export class DeviceForm implements OnInit {
   protected readonly deviceService = inject(Device);
   protected readonly userService = inject(User);
+  protected readonly aiService = inject(Ai);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly fb = inject(FormBuilder);
@@ -26,6 +29,7 @@ export class DeviceForm implements OnInit {
   protected readonly isEdit = signal(false);
   protected readonly duplicateWarning = signal(false);
   private editId: number | null = null;
+  protected aiLoading = signal(false);
 
   protected readonly form = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(200)]],
@@ -121,11 +125,67 @@ export class DeviceForm implements OnInit {
     }
   }
 
+  getTooltipText(): string | null {
+    if (this.duplicateWarning()) {
+      return `A device named ${this.form.get('name')?.value} already exists`;
+    }
+    if (this.form.invalid) {
+      return 'Please complete all required fields correctly';
+    }
+    if (this.deviceService.loading()) {
+      return 'Processing...';
+    }
+    return null;
+  }
+
   goBack(): void {
     if (this.isEdit() && this.editId) {
       this.router.navigate(['/devices', this.editId]);
     } else {
       this.router.navigate(['/devices']);
     }
+  }
+
+  canGenerateDescription(): boolean {
+    const v = this.form.getRawValue();
+    return !!(
+      v.name?.trim() &&
+      v.manufacturer?.trim() &&
+      v.type !== null &&
+      v.operatingSystem?.trim() &&
+      v.osVersion?.trim() &&
+      v.processor?.trim() &&
+      v.ramAmount &&
+      v.ramAmount > 0
+    );
+  }
+
+  generateDescription(): void {
+    if (!this.canGenerateDescription()) return;
+
+    const v = this.form.getRawValue();
+    this.aiLoading.set(true);
+
+    this.aiService
+      .getAiDescription({
+        name: v.name!,
+        manufacturer: v.manufacturer!,
+        type: v.type === 1 ? 'Phone' : 'Tablet',
+        operatingSystem: v.operatingSystem!,
+        osVersion: v.osVersion!,
+        processor: v.processor!,
+        ramAmount: v.ramAmount!,
+      })
+      .subscribe({
+        next: (res) => {
+          this.form.patchValue({ description: res.description });
+          this.toast.success('Description generated ✦');
+          this.aiLoading.set(false);
+        },
+        error: (err) => {
+          this.toast.error(err);
+          this.aiLoading.set(false);
+        },
+      });
   }
 }
