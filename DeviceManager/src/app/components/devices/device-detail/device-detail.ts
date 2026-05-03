@@ -60,10 +60,6 @@ export class DeviceDetail implements OnInit {
     });
   }
 
-  clickIcon() {
-    console.log('clicked');
-  }
-
   onDeleteConfirmed(): void {
     const device = this.deviceService.selectedDevice();
     if (!device) return;
