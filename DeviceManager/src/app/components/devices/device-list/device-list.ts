@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { Device as DeviceService } from '../../../shared/services/device';
 import { Toaster } from '../../../core/services/toaster';
 import { Device, DeviceTypeLabel } from '../../../shared/models/device.model';
@@ -8,6 +8,9 @@ import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm
 import { MatIcon } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { Auth } from '../../../shared/services/auth';
+import { distinctUntilChanged, Subject } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Search } from '../../../shared/services/search';
 
 @Component({
   selector: 'app-device-list',
@@ -18,8 +21,11 @@ import { Auth } from '../../../shared/services/auth';
 export class DeviceList implements OnInit {
   protected readonly deviceService = inject(DeviceService);
   protected readonly authService = inject(Auth);
+  protected readonly searchService = inject(Search);
   protected readonly router = inject(Router);
   private readonly toaster = inject(Toaster);
+
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly showDeleteDialog = signal(false);
   protected readonly deviceToDelete = signal<Device | null>(null);
@@ -40,24 +46,18 @@ export class DeviceList implements OnInit {
   }
 
   // search bar logic
-  protected searchTerm = signal('');
+  protected searchTerm = '';
+  protected isSearching = signal(false);
+  protected searchResults = signal<Device[] | null>(null);
   protected readonly activeFilter = signal<'all' | 'phone' | 'tablet' | 'unassigned'>('all');
+  private readonly searchQuery$ = new Subject<string>();
 
   protected readonly filteredDevices = computed(() => {
     let list = this.deviceService.devices();
-    const term = this.searchTerm().toLowerCase();
     const filter = this.activeFilter();
-
-    if (term) {
-      list = list.filter(
-        (d) =>
-          d.name.toLowerCase().includes(term) ||
-          d.manufacturer.toLowerCase().includes(term) ||
-          d.operatingSystem.toLowerCase().includes(term) ||
-          d.assignedUserName?.toLowerCase().includes(term),
-      );
+    if (this.searchResults() !== null) {
+      list = this.searchResults()!;
     }
-
     if (filter === 'phone') list = list.filter((d) => d.typeLabel === DeviceTypeLabel.Phone);
     if (filter === 'tablet') list = list.filter((d) => d.typeLabel === DeviceTypeLabel.Tablet);
     if (filter === 'unassigned') list = list.filter((d) => !d.assignedUserId);
@@ -67,6 +67,34 @@ export class DeviceList implements OnInit {
 
   ngOnInit(): void {
     this.deviceService.loadAll().subscribe();
+    this.searchQuery$
+      .pipe(distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+      .subscribe((query) => {
+        if (!query.trim()) {
+          this.searchResults.set(null);
+          this.isSearching.set(false);
+          return;
+        }
+        this.isSearching.set(true);
+        this.searchService.searchDevices(query).subscribe({
+          next: (results) => {
+            this.searchResults.set(results);
+            this.isSearching.set(false);
+          },
+          error: () => this.isSearching.set(false),
+        });
+      });
+  }
+
+  onSearchChange(value: string): void {
+    this.searchTerm = value;
+    this.searchQuery$.next(value);
+  }
+
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.searchResults.set(null);
+    this.isSearching.set(false);
   }
 
   confirmDelete(device: Device): void {

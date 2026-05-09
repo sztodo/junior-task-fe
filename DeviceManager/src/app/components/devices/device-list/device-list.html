@@ -21,8 +21,14 @@
         class="search-box__input"
         type="text"
         placeholder="Search devices..."
-        [(ngModel)]="searchTerm"
+        [ngModel]="searchTerm"
+        (ngModelChange)="onSearchChange($event)"
       />
+      @if (isSearching()) {
+        <span class="search-box__spinner"></span>
+      } @else if (searchTerm) {
+        <button class="search-box__clear" (click)="clearSearch()">✕</button>
+      }
     </div>
     <div class="filter-chips">
       <button

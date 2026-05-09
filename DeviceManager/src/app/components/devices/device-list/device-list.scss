@@ -200,7 +200,7 @@
     height: 32px;
     border-radius: 8px;
     border: 1px solid var(--border);
-    background: var(--bg);
+    background: var(--text-tertiary);
     cursor: pointer;
     font-size: 0.9rem;
     display: flex;
@@ -286,4 +286,35 @@
     color: #10b981;
     border: 1px solid rgba(16, 185, 129, 0.3);
     font-weight: 600;
+}
+
+.search-box__spinner {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+
+.search-box__clear {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    padding: 0.2rem;
+    transition: color 0.2s;
+}
+
+.search-box__clear:hover {
+    color: var(--text-primary);
 }
